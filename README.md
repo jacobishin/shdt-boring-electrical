@@ -4,7 +4,7 @@ Electrical system development for the Queen's Hyperloop Boring Team.
 
 ## Current Status
 
-Current milestone: **M1 - System Definition**
+Current milestone: **M2 - Preliminary Design**
 
 The current focus is defining the high-level electrical architecture and identifying the main design work for M2.
 
@@ -85,13 +85,10 @@ boring-electrical/
 │       └── ...
 │
 ├── hardware/
-│   └── kicad/
 │
 ├── firmware/
-│   └── controller/
 │
 ├── software/
-│   └── high-level-computer/
 │
 └── .github/
     ├── ISSUE_TEMPLATE/
