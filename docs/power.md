@@ -41,6 +41,9 @@ Main Motor
    +--> Relays / Contactor Coils
    +--> Interface Electronics
    +--> DC/DC Conversion
+   |
+   v
+5 VDC Power supply
 ```
 
 Current decisions:
@@ -49,6 +52,15 @@ Current decisions:
 - 120 VAC is used primarily for control and support power.
 - 24 VDC is the main control and instrumentation distribution voltage.
 - Exact motor-control hardware has not yet been selected.
+
+## Electrical Loads
+480 VAC, 3-phase motor loads
+24 VDC control electronics (Teensy, Raspberry Pi)
+24 VDC sensors
+5 VDC sensors
+24 VDC contactor coils
+24 VDC relay coils
+
 
 ## M2 Design Work
 
