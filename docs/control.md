@@ -52,6 +52,28 @@ Safety Relay / Hardwired Safety Circuit
                      Low-Level Controller
 ```
 
+## Safety Architecture
+For safety, there's essentially three separate safety systems:
+- Physical E-stop
+- Automatic hardware stops
+- MCU controlled stop
+
+### Physical E-stop
+There's a large and obvious physical button that when used, allows the operator to stop hazardous machine operation. This should physically interupt the connection between the hardware and the power source. 
+
+### Automatic Hardware stops
+As well, there should be automatic, independent electrical hardware that detects unsafe operation, and automatically stops the hazardous operation. This will be specific to specific components and connections, but may include:
+- safety relays
+- contactors
+- power isolation
+- hardware interlocks
+- electrical protection devices (circuit breakers, fuses, PE's, surge protection, etc)
+
+
+### MCU controlled stop
+The MCU adds a third layer of protection, which is software controlled. It involves automatic shutdowns through sensor monitoring, watchdogs, state validation, etc. It can also be stopped by the operator through GUI control
+
+
 ## M2 Design Work
 
 - select the low-level controller
