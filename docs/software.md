@@ -4,7 +4,7 @@
 
 Software is responsible for:
 
-- high-level computer software
+- high-level computer software (On pi)
 - low-level controller firmware/software
 - communication between controllers
 - operator interface
@@ -50,7 +50,6 @@ The required machine behavior, including states, interlocks, and fault responses
 
 ## M2 Design Work
 
-- select the high-level computer
 - define communication between the two control layers
 - define the command and telemetry data exchanged
 - define GUI requirements
@@ -64,7 +63,6 @@ The required machine behavior, including states, interlocks, and fault responses
 
 ## Open Questions
 
-- What high-level computer should be used?
 - How should the high-level computer and low-level controller communicate?
 - What messages need to be exchanged?
 - What information should the operator see?

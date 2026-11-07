@@ -16,7 +16,7 @@ Control is responsible for:
 
 ## Current Architecture
 
-The machine will use a low-level controller for direct machine control.
+The machine will use a low-level controller (Teensy 4.1) for direct machine control.
 
 Expected responsibilities include:
 
@@ -28,33 +28,8 @@ Expected responsibilities include:
 - issuing motor-control commands
 - reporting machine status
 
-Exact controller hardware is still TBD.
-
-Possible options include:
-
-- Teensy
-- STM32-based controller
-- PLC
-
-Emergency shutdown will use a separate hardware safety path and will not rely solely on normal controller software.
-
-```text
-E-Stop / Safety Inputs
-        |
-        v
-Safety Relay / Hardwired Safety Circuit
-        |
-        +------------------> Motor Inhibit
-        |
-        +------------------> Safety Status
-                                |
-                                v
-                     Low-Level Controller
-```
-
 ## M2 Design Work
 
-- select the low-level controller
 - create the machine IO list
 - define required sensors
 - define sensor signal types and interfaces

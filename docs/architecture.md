@@ -1,168 +1,169 @@
-# Electrical Architecture
+# Electrical System Architecture
 
-## Purpose
+## 1. Purpose
 
-This document defines the high-level electrical architecture for the boring machine at the end of M1.
+This document describes the high-level electrical architecture of the boring machine design. It defines the three main electrical subsystems and their areas of responsibility. The purpose is to establish the overall system structure, so detailed design work is located in the specific subsystem files
 
-Detailed subsystem design will be developed separately during M2.
+## 2. System Overview
 
-## System Overview
+The electrical system is divided into three subsystems:
 
-The electrical system is divided into four main functions:
-
-- Power & Drives
-- Machine Control
-- Supervision & Operator Interface
-- Hardware Safety
-
-High-level system flow:
+- **Control** manages the machine's physical inputs and outputs, processes sensor information, and coordinates machine operation.
+- **Power** supplies and distributes electrical energy to the machine's equipment and electrical systems.
+- **Software** provides the operator interface, communication, monitoring, and high-level machine functions.
 
 ```text
-Operator Laptop
-      |
-      v
-High-Level Computer
-      |
-      v
-Low-Level Controller
-   /         \
-Sensors    Motor Control
-                |
-                v
-            Main Motor
-
-Hardware Safety
-      |
-      +------------------> Motor Inhibit
+             Operator Interface
+                     |
+                 Software
+                     |
+              High-Level Commands
+                     |
+                  Control
+                     |
+          Machine Inputs and Outputs
+                     |
+                   Power
+                     |
+             Motors and Equipment
 ```
 
-Exact controller hardware is still TBD.
 
-## Power Architecture
+## 3. Power Architecture
 
-The current power architecture is:
+The machine uses multiple voltage levels to supply its electrical equipment. The current plan for power architecture is:
+
+| Voltage | Primary Purpose |
+|---|---|
+| 480 VAC, 3-phase | Main high-power motor supply |
+| 120 VAC | Supporting electrical and control power |
+| 24 VDC | Main control and instrumentation supply |
+| Lower-voltage DC | Electronic components requiring lower operating voltages |
+
+The general power distribution structure is:
 
 ```text
-480 VAC, 3-phase
-      |
-      v
+480 VAC, 3-Phase
+       |
 Protection / Disconnect
-      |
-      v
+       |
 Motor Control
-      |
-      v
-Main Motor
+       |
+Main Motors
+
 
 120 VAC
    |
-   v
 24 VDC Power Supply
    |
-   v
 24 VDC Distribution
    |
-   +--> Safety Hardware
-   +--> Sensors
-   +--> Relays / Contactor Coils
-   +--> Interface Electronics
-   +--> DC/DC Conversion
-             |
-             v
-      Low-Voltage Electronics
+   +---- Control Hardware
+   |
+   +---- Sensors and Instrumentation
+   |
+   +---- Supporting Electrical Devices
+   |
+   +---- 5 VDC/DC Conversion
+              |
+       Lower-Voltage Electronics
 ```
 
-Current decisions:
+## 4. Subsystem Responsibilities
 
-- 480 VAC is used for the main high-power motor path.
-- 120 VAC is used primarily for control and support power.
-- 24 VDC is the main control and instrumentation distribution voltage.
-- Lower-voltage electronics will use DC/DC conversion as required.
-- Exact motor-control hardware is still TBD.
-- The existing EDR-120-24 is the current candidate 24 VDC supply and will be checked during M2.
+### 4.1 Control
 
-## Control Architecture
+The Control subsystem manages the machine's physical hardware and coordinates its operation. Essentially, it is responsible for translating commands into machine-level actions. The central processing with be an an MCU, namely, a Teensy 4.1.
 
-The machine will use two control layers.
+Its responsibilities include:
 
-### High-Level Computer
+- Interfacing with sensors and electrical hardware.
+- Acquiring and processing machine inputs.
+- Managing machine states and operating conditions.
+- Controlling physical outputs and equipment.
+- Implementing local interlocks and fault responses.
+- Communicating machine status and information to Software.
 
-Responsible for:
+More information in [control](control.md)
 
-- operator communication
-- networking
-- telemetry
-- logging
-- GUI/backend functions
-- sending high-level commands to the low-level controller
 
-Exact hardware is TBD.
+### 4.2 Power
 
-### Low-Level Controller
+The Power subsystem supplies and distributes electrical energy throughout the machine.
 
-Responsible for:
+Its responsibilities include:
 
-- sensor and machine IO
-- machine state
-- local interlocks
-- fault handling
-- actuator commands
-- motor-control commands
+- Receiving and distributing incoming electrical power.
+- Providing appropriate voltage levels to electrical equipment.
+- Supplying power to motors and other high-power devices.
+- Supporting motor control and operation.
+- Providing electrical protection and power isolation.
+- Supplying electrical power to Control and Software hardware.
 
-Exact hardware is TBD.
+More information in [power](power.md)
 
-The high-level computer sends high-level requests to the low-level controller. The low-level controller determines whether those requests are allowed before commanding machine hardware.
+### 4.3 Software
 
-## Hardware Safety
+The Software subsystem provides the high-level software functions required to operate and monitor the machine. It will run on a Raspberry Pi, or an equivalent high-level computer. 
 
-Emergency shutdown will use a hardware safety path independent of normal control software.
+Its responsibilities include:
 
-The current concept is:
+- Providing the graphical user interface (GUI).
+- Allowing operators to interact with the machine.
+- Sending high-level operating commands to Control.
+- Displaying machine measurements and status information.
+- Handling communication between system components.
+- Logging machine data and reporting faults.
+- Providing software-based shutdown requests.
 
-```text
-E-Stop / Safety Inputs
-        |
-        v
-Safety Relay / Hardwired Safety Circuit
-        |
-        +------------------> Motor Inhibit
-        |
-        +------------------> Safety Status
-                                |
-                                v
-                     Low-Level Controller
-```
+More information in [software](software.md)
 
-The controller may monitor safety status, but software will not be the only mechanism capable of stopping hazardous motion.
+## 5. Safety
 
-Exact safety hardware and implementation are still TBD.
+Safety is a responsibility and consideration of all three subsystems. The safety responsibilities of each subsystem are documented below:
 
-## Main Interfaces
-
-| Interface | Purpose |
+| Subsystem | Safety Responsibilities |
 |---|---|
-| Operator Laptop <-> High-Level Computer | Operator commands, GUI, telemetry |
-| High-Level Computer <-> Low-Level Controller | Commands, state, faults, telemetry |
-| Low-Level Controller <-> Sensors | Machine measurements and status |
-| Low-Level Controller <-> Motor Control | Normal motor commands and status |
-| Hardware Safety -> Motor Control | Independent hazardous-motion inhibit |
-| Hardware Safety -> Low-Level Controller | Safety status monitoring |
-| 24 VDC Distribution -> Control Hardware | Control and instrumentation power |
+| Control | Monitors machine conditions, processes safety inputs, implements interlocks, and manages fault responses. |
+| Power | Provides electrical protection and hardware capable of disconnecting hazardous power. |
+| Software | Displays warnings and faults, monitors machine status, and provides GUI-based shutdown requests. |
 
-Detailed protocols, wiring, pinouts, and component selections will be developed during M2.
+The machine will have two manual emergency stops: a GUI based E-stop, and a large physical E-stop with a latching mechanism, which interupts the flow of power. 
 
-## Open Questions
+## 6. Subsystem Interfaces
 
-- What high-level computer should be used?
-- What low-level controller should be used?
-- How should the two controllers communicate?
-- What sensors and IO are required?
-- What motor-control method should be used?
-- Is variable speed required?
-- Is reverse operation required?
-- Is the existing 24 VDC supply sufficient?
-- What branch protection is required?
-- How should grounding and bonding be implemented?
-- What safety relay or safety hardware should be used?
-- What machine states, interlocks, and fault responses are required?
-- What should the operator interface display and control?
+The table below documents interfaces between subsystems. 
+
+| Interface | Description |
+|---|---|
+
+| Control → Software | Sends machine measurements, operating status, and fault information. |
+| Control ↔ Machine Equipment | Interfaces with sensors, actuators, and motor-control hardware. |
+| Power → Control | Supplies electrical power to control hardware and connected devices. |
+| Power → Software | Supplies electrical power to computing and interface hardware. |
+| Power → Machine Equipment | Supplies electrical power to motors and other electrical loads. |
+| Software → Control | Sends operating commands and shutdown requests. |
+
+Specifics will be established during M3
+
+## 7. Open Design Questions
+
+The following items require further investigation and development:
+
+- Final selection of control hardware and computing hardware.
+- Communication interface between Control and Software.
+- Detailed power distribution and branch protection.
+- Motor-control hardware and implementation.
+- Sensor interfacing and signal conditioning.
+- Physical E-stop and independent hardware safety architecture.
+- Power requirements for each subsystem.
+- Verification of subsystem interfaces and system-level operation.
+
+These decisions will be developed and documented as the individual subsystems progress.
+
+## 8. Related Documentation
+
+- [Requirements documentation](requirements.md)
+- [Control subsystem documentation](control.md)
+- [Power subsystem documentation](power.md)
+- [Software subsystem documentation](software.md)
