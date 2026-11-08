@@ -52,6 +52,25 @@ Safety Relay / Hardwired Safety Circuit
                      Low-Level Controller
 ```
 
+## Sensor Requirements
+
+Competition Requirements
+•	Telemetry >= 0.1 Hz
+•	Critical I/O must be monitored and interlocked
+
+Measured values
+- 	Drill RPM: Monitors cutterhead’s rotational speed
+- 	Drill Depth: Measure digging progress and current depth
+- 	Motor Current: Monitors current drawn from the motor
+- 	Motor Temperature: Detects temperature and overheating
+- 	Machine Inclination: Measure deviation from initial inclination
+- 	Travel Limits: Detects end of travel position
+
+Calculated values 
+
+- Feed speed: Derived from drill depth
+
+
 ## M2 Design Work
 
 - select the low-level controller
