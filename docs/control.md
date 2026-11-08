@@ -14,6 +14,8 @@ Control is responsible for:
 - hardware safety
 - motor enable and inhibit behavior
 
+this is a test
+
 ## Current Architecture
 
 The machine will use a low-level controller (Teensy 4.1) for direct machine control.
