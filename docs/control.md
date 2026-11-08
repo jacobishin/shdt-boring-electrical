@@ -70,6 +70,22 @@ Calculated values
 
 - Feed speed: Derived from drill depth
 
+Preliminary Decisions
+
+- Drill RPM Options
+        - Sensorless control: Tracking RPM directly from the motor by using a built-in encoder.
+                  - This would optimize precision and the space used.
+                  - Heavily dependent on motor used.
+                  - Requires less power.
+        - Hall effect sensor: Tracks a permanent magnet on the shaft to track RPM.
+                  - Requires protection, cannot be exposed.
+                  - Won't be able to tell exact degree of rotation, though that might not be required.
+        - Inductive Proximity sensor:
+- Drill Depth Sensor Options
+        - Ultrasonic sensor:
+  
+
+
 
 ## M2 Design Work
 
