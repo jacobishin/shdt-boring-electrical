@@ -16,7 +16,7 @@ Control is responsible for:
 
 ## Current Architecture
 
-The machine will use a low-level controller for direct machine control.
+The machine will use a low-level controller (Teensy 4.1) for direct machine control.
 
 Expected responsibilities include:
 
@@ -97,7 +97,6 @@ Travel Limit:
 
 ## M2 Design Work
 
-- select the low-level controller
 - create the machine IO list
 - define required sensors
 - define sensor signal types and interfaces
