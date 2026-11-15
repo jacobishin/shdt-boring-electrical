@@ -4,78 +4,70 @@
 
 Software is responsible for:
 
-- high-level computer software (On pi)
-- low-level controller firmware/software
-- communication between controllers
-- operator interface
-- telemetry
-- logging
-- networking
+*   high-level computer software (on Raspberry Pi)
+*   communication link with the low-level controller (co-defined with Control)
+*   operator interface (Operator GUI and Telemetry GUI)
+*   competition server telemetry reporting (0.1 Hz HTTP POST JSON payload)
+*   external datastore logging
+*   networking and link monitoring
 
 ## Current Architecture
 
 The machine will use two control layers.
 
 ```text
-Operator Laptop
+Operator Laptop (GUI)
       |
       v
-High-Level Computer
+High-Level Computer (Software - Raspberry Pi)
       |
       v
-Low-Level Controller
+Low-Level Controller (Control - Teensy 4.1)
       |
       v
-Machine
+   Machine
 ```
 
 ### High-Level Computer
 
 Expected responsibilities include:
 
-- operator communication
-- networking
-- telemetry handling
-- data logging
-- GUI or backend services
-- sending high-level commands to the low-level controller
+*   operator communication and GUI hosting/backend services
+*   networking and active monitoring of all communication links
+*   telemetry handling and 0.1 Hz JSON POST requests to the TBC server
+*   data logging of all I/O List parameters to an external datastore
+*   sending high-level operating commands and interlock-override requests (with TBC approval) to the low-level controller
 
-Exact hardware is still TBD.
+Exact hardware is still TBD (baseline: Raspberry Pi).
 
-### Low-Level Controller Software
+### Interface with Low-Level Controller
 
-Software will implement the firmware/software required by the low-level controller.
-
-The required machine behavior, including states, interlocks, and fault responses, will be defined jointly with Control.
+Control implements the firmware/software on the low-level controller (Teensy 4.1). Software and Control jointly define the communication protocol (ICD), command set, telemetry packets, and heartbeat watchdog between the Raspberry Pi and Teensy 4.1.
 
 ## M2 Design Work
 
-- define communication between the two control layers
-- define the command and telemetry data exchanged
-- define GUI requirements
-- define telemetry requirements
-- define logging requirements
-- define networking behavior
-- define reconnect behavior
-- define communication-loss handling
-- define watchdog behavior
-- create the first software structure and prototypes
+*   co-define the communication protocol (ICD) and command/telemetry data exchanged between the Raspberry Pi and Teensy 4.1 with Control
+*   define GUI requirements (Critical I/O displays, alarm/warn indicators, interlock status, TBC-approved interlock disable mechanism, manual fallback controls)
+*   define telemetry requirements (including the 0.1 Hz TBC JSON schema)
+*   define external datastore logging requirements
+*   define networking and reconnect behavior
+*   define high-level communication-loss handling, stale-data indicators, and global abort triggers
+*   create the first high-level software structure and GUI prototypes
 
 ## Open Questions
 
-- How should the high-level computer and low-level controller communicate?
-- What messages need to be exchanged?
-- What information should the operator see?
-- What commands should the operator be allowed to send?
-- What data should be logged?
-- How should the GUI indicate stale or lost data?
-- What should happen when either controller restarts?
-- What watchdog or heartbeat behavior is required?
+*   How should the high-level computer and low-level controller communicate (e.g., Ethernet, CAN, USB/UART)?
+*   What messages and heartbeat intervals need to be exchanged in the ICD?
+*   What information should the operator see on the primary tab vs. specialized tabs?
+*   What commands should the operator be allowed to send in closed-loop vs. manual fallback modes?
+*   How should the external datastore be structured for live viewing and debugging?
+*   How should the GUI indicate stale data, network loss, or machine power loss?
 
 ## Extra Note
 
-Control defines required machine behavior. Software implements that behavior in firmware and software.
+Control owns the low-level controller hardware and firmware, enforcing real-time state transitions and hardware interlocks. Software owns the high-level computer, operator GUI, data logging, and external networking.
 
-So For example:
-- Control defines what should happen when a sensor fails.
-- Software implements that response in the controller code.
+So for example:
+
+*   Control detects a sensor failure on the Teensy 4.1, triggers a local interlock/safe state in firmware, and reports the fault status over the serial/network link.
+*   Software receives the fault report on the Raspberry Pi, logs the event to the external datastore, highlights the alarm/interlock on the Operator GUI, and provides the interface for operator recovery or TBC-approved override.
