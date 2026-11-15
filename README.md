@@ -36,6 +36,7 @@ Responsible for:
 - faults
 - E-stop and hardware safety
 - motor enable and inhibit behavior
+- - low-level controller firmware
 
 See [Control](docs/control.md).
 
@@ -44,7 +45,6 @@ See [Control](docs/control.md).
 Responsible for:
 
 - high-level computer software
-- low-level controller firmware/software
 - controller communication
 - GUI
 - telemetry
