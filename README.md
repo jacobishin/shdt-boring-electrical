@@ -4,7 +4,7 @@ Electrical system development for the Queen's Hyperloop Boring Team.
 
 ## Current Status
 
-Current milestone: **M2 - Preliminary Design**
+Current milestone: **M3 - FDP**
 
 The current focus is defining the high-level electrical architecture and identifying the main design work for M2.
 
