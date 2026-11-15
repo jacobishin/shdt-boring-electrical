@@ -4,120 +4,56 @@
 
 Control is responsible for:
 
-- sensors
-- machine IO
-- low-level control requirements
-- machine states
-- interlocks
-- fault handling
-- E-stop architecture
-- hardware safety
-- motor enable and inhibit behavior
+*   low-level controller hardware and firmware (Teensy 4.1)
+*   sensor interfacing and signal conditioning
+*   actuator and motor-control command signals
+*   machine state machine, safety interlocks, and fault handling
+*   hardwired E-stop safety relay logic and motor-inhibit signals (co-designed with Power)
 
 ## Current Architecture
 
-The machine will use a low-level controller (Teensy 4.1) for direct machine control.
-
-Expected responsibilities include:
-
-- reading sensors
-- controlling machine outputs
-- maintaining machine state
-- checking local interlocks
-- detecting faults
-- issuing motor-control commands
-- reporting machine status
-
-Exact controller hardware is still TBD.
-
-Possible options include:
-
-- Teensy
-- STM32-based controller
-- PLC
-
-Emergency shutdown will use a separate hardware safety path and will not rely solely on normal controller software.
+The Control subsystem centers around a Teensy 4.1 microcontroller that interfaces directly with the machine's sensors, actuators, and motor-control hardware, while communicating with the high-level computer (Software).
 
 ```text
-E-Stop / Safety Inputs
-        |
-        v
-Safety Relay / Hardwired Safety Circuit
-        |
-        +------------------> Motor Inhibit
-        |
-        +------------------> Safety Status
-                                |
-                                v
-                     Low-Level Controller
+High-Level Computer (Software)
+              |
+              v
+   Teensy 4.1 (Control Hardware & Firmware)
+      |               |               |
+      v               v               v
+   Sensors      Motor Control     Actuators
 ```
 
-## Sensor Requirements
+### Low-Level Controller Hardware & Firmware
 
-Competition Requirements:
-+ Telemetry >= 0.1 Hz
-+ Critical I/O must be monitored and interlocked
+Control owns both the physical electrical interfacing and the embedded C/C++ firmware running on the Teensy 4.1. Expected responsibilities include:
 
-Measured values:
-- 	Drill RPM: Monitors cutterhead’s rotational speed
-- 	Drill Depth: Measure digging progress and current depth
-- 	Motor Current: Monitors current drawn from the motor
-- 	Motor Temperature: Detects temperature and overheating
-- 	Machine Inclination: Measure deviation from initial inclination
-- 	Travel Limits: Detects end of travel position
+*   reading and conditioning sensor inputs (RPM, depth, motor current, motor temperature, inclination, travel limits)
+*   maintaining the authoritative machine state machine
+*   enforcing critical I/O bounds and safety interlocks
+*   executing local abort and safe-stop sequences upon fault or communication loss
+*   generating low-level control outputs for motor drives and actuators
+*   exchanging telemetry and high-level commands with the Raspberry Pi
 
-Feed speed can be derived from drill depth rather than directly measured.
+### Safety & Motor Inhibit Interface (Joint with Power)
 
-Preliminary Decisions
-
-Drill RPM:
-+ Rotary encoder: Tracking RPM using an encoder. Can have high resolution, better for greater accuracy, can be more expensive.
-+ Hall effect sensor: Tracks a permanent magnet to track RPM. Requires protection, cannot be exposed. Won't be able to tell exact degree of rotation, though that might not be required. less expensive
-+ note: Hall effect sensor can also measure angular position.
-
-Drill Depth Sensor: 
-+ Magnetic linear encoder: Provides direct non contact measurements. Needs to be aligned and mounted.
-
-Motor Current:
-+ Hall-effect current transducer: Measures current through a magnetic field, can measure AC/DC current.
-+ Motor-drive current telemetry: if cutterhead used a VFD, separate transducer may not be required at all.
-
-Motor Temperature:
-+ PT100/PT1000 RTD: High accuracy, stable. Nearly linear responsive curve. More expensive option (relative to NTC thermistors).
-+ NTC thermistors: Fits temperature range, Non linear responsive curve. More affordable.
-
-Machine Inclination:
-+ Industrial 2-axis inclinometer: Preferred. High accuracy, however less reliable when exposed to vibration. (though dynamic options slightly mitigate that by using acceleration and angular-rate measurements for movement.) More expensive.
-+ 6-axis IMU: measures 3-axis acceleration and 3-axis angular velocity. Less appropriate for a directionally static machine, therefore would require more calibration, but less expensive.
-  
-Travel Limit:
-+ Inductive proximity sensor: Non contact, detects a metal target, resistant to debris and vibration. Short sensing range, however.
-+ Mechanical limit switch: Activates a switch once a particular position is reached. Could potentially be implemented for e-stop safety instead.
-
+*   Control specifies the safety relay logic, E-stop state monitoring, and two-action reset behavior.
+*   Control and Power jointly own the interface between the safety relay outputs, 24 VDC contactor/relay coils, and VFD Safe Torque Off (STO) / motor-inhibit inputs.
 
 ## M2 Design Work
 
-- create the machine IO list
-- define required sensors
-- define sensor signal types and interfaces
-- define machine states
-- define interlocks
-- define fault conditions and responses
-- define communication-loss behavior
-- define the E-stop implementation
-- define safety reset behavior
-- define the motor-control interface
-- define how safety status is monitored by the controller
+*   define the machine state diagrams and Theory of Operations
+*   finalize the I/O List (critical flags, warning bounds, alarm/interlock bounds)
+*   select sensors and design signal-conditioning circuits
+*   implement initial low-level controller firmware structure on the Teensy 4.1
+*   co-define the serial/network Interface Control Document (ICD) and heartbeat watchdog with Software
+*   define local abort behavior upon communication loss or sensor timeout (>10 seconds)
+*   define reboot and encoder/position homing behavior so I/O reflects physical reality after power loss
+*   co-design the hardwired E-stop and motor-inhibit schematic with Power
 
 ## Open Questions
 
-- What low-level controller should be used?
-- What sensors are required?
-- What IO count and signal types are required?
-- What machine states are needed?
-- What conditions should prevent motion?
-- What faults should stop the machine?
-- What should happen if communication is lost?
-- What safety relay or safety hardware should be used?
-- How should the safety circuit inhibit the motor?
-- How should the system be reset after an E-stop or fault?
+*   What specific signal conditioning and protection circuits are needed for each sensor?
+*   What control signals are required by the selected VFD or soft starter?
+*   How will relative encoders or depth measurements be restored/homed after a power cycle?
+*   How is the safety relay wired to guarantee motor inhibition while keeping <50 V control power active for telemetry?

@@ -4,83 +4,70 @@
 
 Power is responsible for:
 
-- 480 VAC machine power
-- 120 VAC support power
-- 24 VDC control power
-- DC/DC conversion
-- motor-control hardware
-- electrical protection
-- grounding and bonding
-- power wiring
+*   480 VAC 3-phase main power intake and distribution
+*   120 VAC support power distribution
+*   24 VDC and lower-voltage DC conversion and distribution
+*   branch circuit protection, grounding, and residual current monitoring
+*   motor-control power hardware (VFDs, soft starters, contactors)
+*   hardwired E-stop power interruption, LOTO disconnects, and 480 VAC energized status indication (stacklight)
 
 ## Current Architecture
 
+Power receives site power and distributes protected supply rails to all motors, actuators, control electronics, and computing hardware.
+
 ```text
-480 VAC, 3-phase
-      |
-      v
-Protection / Disconnect
-      |
-      v
-Motor Control
-      |
-      v
-Main Motor
-
-
-120 VAC
+480 VAC, 3-Phase Supply
    |
-   v
+   +---- Energized Indicator (Stacklight)
+   |
+   +---- Main Disconnect (LOTO) & RCM
+            |
+     E-Stop Contactor / Motor Control (VFD / Soft Starter)
+            |
+       Main Motors
+
+
+120 VAC Supply
+   |
 24 VDC Power Supply
    |
-   v
-24 VDC Distribution
+   +---- Unswitched 24 VDC Bus (Control & Telemetry Electronics)
+   |        |
+   |     5 VDC Conversion (Low-Voltage Logic)
    |
-   +--> Safety Hardware
-   +--> Sensors
-   +--> Relays / Contactor Coils
-   +--> Interface Electronics
-   +--> DC/DC Conversion
-   |
-   v
-5 VDC Power supply
+   +---- Switched 24 VDC Bus (E-Stop Gated Contactor Coils & Actuators)
 ```
 
-Current decisions:
+### High-Power & Motor Control Hardware
 
-- 480 VAC is used for the main high-power motor path.
-- 120 VAC is used primarily for control and support power.
-- 24 VDC is the main control and instrumentation distribution voltage.
-- Exact motor-control hardware has not yet been selected.
+*   480 VAC 3-phase distribution, cabling, and locking connectors
+*   Lock Out Tag Out (LOTO) main disconnect and residual current monitoring (e.g., Bender RCM420)
+*   480 VAC stacklight wired directly to indicate when the machine is energized
+*   VFD, soft starter, or main contactor power-stage wiring and thermal management
 
-## Electrical Loads
-480 VAC, 3-phase motor loads
-24 VDC control electronics (Teensy, Raspberry Pi)
-24 VDC sensors
-5 VDC sensors
-24 VDC contactor coils
-24 VDC relay coils
+### Low-Voltage Distribution
 
+*   120 VAC to 24 VDC power supply and distribution
+*   separation of low-voltage control/telemetry bus (remains active during E-stop) and actuator/contactor coil bus (inhibited during E-stop)
+*   DC/DC conversion (e.g., 5 VDC) for low-level and high-level logic hardware
+
+### Safety & E-Stop Power Interruption (Joint with Control)
+
+*   Power and Control co-design the physical E-stop circuit, safety relay wiring, and motor-inhibit/contactor coil connections so hazardous power is interrupted near the source while maintaining safe low-voltage telemetry.
 
 ## M2 Design Work
 
-- confirm the motor electrical requirements
-- determine whether variable speed or reverse operation is required
-- select the motor-control method
-- create the 24 VDC load budget
-- confirm whether the existing 24 VDC supply is sufficient
-- define 24 VDC branch distribution
-- select branch protection
-- define required DC/DC conversion
-- define grounding and bonding
-- define cable and connector requirements
-- develop the preliminary electrical layout
+*   complete the machine power budget across all subsystems
+*   size circuit breakers, fuses, contactors, and cabling
+*   establish electrical wire color-coding standards
+*   select motor-control hardware (VFD vs. soft starter vs. contactors)
+*   design the 480 VAC, 120 VAC, and 24 VDC electrical schematics
+*   co-design the E-stop safety relay and motor-inhibit wiring with Control
+*   select power supply telemetry sensors (voltage, current, supply temperature) to feed into Control
 
 ## Open Questions
 
-- What are the final motor voltage, current, and startup requirements?
-- Should the motor use a contactor, soft starter, or VFD? Is variable speed required? Is reverse required?
-- Is the EDR-120-24 enough?
-- What protection is required on each power branch?
-- What lower voltages are required by the selected controllers?
-- Where will the electrical hardware be physically mounted?
+*   What is the peak and continuous current draw of the main drive motor under load?
+*   Will the main motor use a VFD, soft starter, or across-the-line contactor?
+*   What enclosure cooling is required to keep power electronics below maximum operating temperatures?
+*   How are the separate 24 VDC control and peripheral buses isolated during an E-stop event?
