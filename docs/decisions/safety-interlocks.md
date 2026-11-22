@@ -24,7 +24,7 @@ This mode can be accessed from the GUI. Entering this mode will require delibera
 
 | System | Acceptable Failed Feedback | Unacceptable Feedback (Cannot run fallback system if lost) | Manual Fallback Operations (via GUI) | 
 | ------------ | ------------- |------------- |------------- |
-| Main Drive (Cutterhead, Motor) | Machine Inclination, Drill RPM, Can also be used if automatic drilling fails. | Temperature Sensor, Current Sensor, HLC-MCU communication, GUI failure,  E-Stopped activated.  | Stop/Start, Drill Speed, Drill Direction.  |
+| Main Drive (Cutterhead, Motor) | Machine Inclination, Drill RPM, Can also be used if automatic drilling fails. | Temperature Sensor, Current Sensor, LLC-MCU communication, GUI failure,  E-Stopped activated.  | Stop/Start, Drill Speed, Drill Direction.  |
 | Thrust System | TBD | TBD | Will be added to when thrust system is closer to finalized. |
 
 
