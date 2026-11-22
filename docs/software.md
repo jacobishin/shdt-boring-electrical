@@ -38,7 +38,7 @@ Expected responsibilities include:
 *   data logging of all I/O List parameters to an external datastore
 *   sending high-level operating commands and interlock-override requests (with TBC approval) to the low-level controller
 
-Exact hardware is still TBD (baseline: Raspberry Pi).
+Exact hardware is still TBD (baseline: Raspberry Pi). 
 
 ### Interface with Low-Level Controller
 
