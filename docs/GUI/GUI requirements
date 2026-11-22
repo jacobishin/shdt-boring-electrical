@@ -1,0 +1,30 @@
+Tunneling GUI set-up
+
+Hardware:
++ Raspberry Pi 5
++ Display monitor - dedicated monitor or laptop
++	Screen size TBD
+
+Sensor readings/reqs
++ Drill RPM: Monitors cutterhead’s rotational speed
++ Drill Depth: Measure digging progress and current depth
++ Motor Current: Monitors current drawn from the motor
++ Motor Temperature: Detects temperature and overheating
++ Machine Inclination: Measure deviation from initial inclination
++ Travel Limits: Detects end of travel position
++ Feed speed can be derived from drill depth rather than directly measured
++ Low/High warnings and interlocks
++ output voltage, current, and supply temperature
+
+Buttons:
++ Start button
++ Shutdown button
++ Option to disable interlock
++ E-brake release
+
+Other info:
++ Current state/task progress
++ Connection to controller (network loss)
++ Power connection
++ All Interlock statuses
++ E-brake data
