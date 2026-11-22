@@ -40,10 +40,10 @@ The system is initialized by the user through the GUI. Once remaining interlocks
 During recovery after power loss, sensors will need to recover and reflect the state of the current machine. This means restoring sensor data prior to the loss of power alone is not sufficient for some sensors. This is dependent on sensor choice, and as of right now the current chosen sensors will be able to collect new data without any issue or need for recalibration. This is subject to change.
 
 The following sensors will collect new data upon restart.
-+Hall effect sensors
-+(Absolute) magnetic linear encoder
-+VFD telemetry (if available)
-+PT100/PT1000 RTD
-+Mechanical safety-rated limit switch/inductive proximity sensor
-Industrial 2-axis inclinometer
++ Hall effect sensors
++ (Absolute) magnetic linear encoder
++ VFD telemetry (if available)
++ PT100/PT1000 RTD
++ Mechanical safety-rated limit switch/inductive proximity sensor
++ Industrial 2-axis inclinometer
 
