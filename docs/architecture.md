@@ -161,3 +161,76 @@ These decisions will be developed and documented as the individual subsystems pr
 *   [Control subsystem documentation](control.md)
 *   [Power subsystem documentation](power.md)
 *   [Software subsystem documentation](software.md)
+
+## Controller Architecture
+
+The baseline architecture centers on a Raspberry Pi 5 running the Software subsystem, connected to a Teensy 4.1 microcontroller that manages low-level control hardware, firmware, sensors, actuators, and motor-control interfaces. 480 VAC 3-phase (60 Hz) / 120 VAC power, a 100 kW maximum power limit, and JSON telemetry reporting to the server.
+
+## ECU's
+
+High Level computer         Raspberry Pi 5            Software        hosts remote GUI, monitors network links, logs all I/O data,send
+                                                                      JSON telemetry data to competition server. Sends commands, heartbeats, and shutdown requests
+
+Low Level Controller        Teensy 4.1                 Control        Runs embedded firmware, reads/conditions sensors. enforces critical
+                                                                      I/O bounds. Generates drive/actuator outputs. execcutes safe stop.
+
+Hardwired Relay             24 VDC safety 
+                            relay module           Power and control  Monitors emergency stops. drops 24 VDC source side coild and VFD
+                                                                      safe torque off; stop hazardous motion
+
+Digging motor drive         480 VAC VFD                 Control       powers and controls the digging motor using open loop vector 
+                                                                      control. 
+
+*Thrust controller          VSM                        Control        used to excavate vertical underground shafts while simultaneously 
+                                                                      lowering the lining
+
+## Key readings
+
+480 VAC 3-phase voltage/current, total active power draw (capped at 100 kW), 120 VAC circuit voltage, and 24 VDC control rail voltage.
+
+Cutterhead/motor RPM, digging motor current, and motor temperature.
+
+Hardwired E-stop/safety relay state, contactor and STO feedback, and HLC-to-Teensy communication status.
+
+Control Outputs: VFD STOP/motor-inhibit permit, Motor run enable, plus optional speed reference and forward/reverse command.
+
+## Master I/O 
+
+|I/O channel    |      Criticality   |       Units    |     Low alarm  |   High alarm  |  High Warn    |      Low Warn|
+
+| --- | --- | --- | --- | --- | --- | --- |
+
+|E-stop       |        yes           |       Bool    |      0       |      N/A     |      N/A       |           N/A|
+
+|Contactor VFD |
+|Stop           |      yes           |       Bool     |     Mismatch  |    Mismatch  |    N/A         |         N/A|
+
+|Comms timeout  |      yes           |       s        |     N/A      |     1.0       |    0.5        |          N/A|
+
+|Contactor    |
+|Enable & stop  |      yes           |        Bool     |     N/A    |       N/A      |     N/A        |          N/A|
+
+|480 VAC           |
+|3-phase voltage   |    yes           |       V AC     |     430     |      530    |      505         |          455  |                  
+|(BUS)             |
+
+|120 VAC circuit  |
+|voltage (BUS)    |    yes         |         V AC     |     105     |      135     |     128         |          112|
+
+|24 VDC control   |
+|Bus voltage      |    yes          |        V DC     |     21.0     |     27.0     |    25.5        |          22.5|
+
+|Digging motor    |
+|speed            |    yes          |        RPM     |      2      |      55      |      45          |           8|
+
+|Digging motor    |
+|CMD(run/speed/   |
+|dir)             |     yes         |         %/Bool    |    0      |       100    |      N/A         |          N/A|
+
+|Thrust velocity  |     yes         |        %/Bool   |    -100     |     100     |     N/A           |        N/A|
+
+|machine         |
+|inclination     |       yes        |          deg     |     -3.0     |     3.0     |      1.5         |        -1.5|
+
+|Telemetry       |
+|post interval   |      no          |          s       |      N/A      |     20      |      12         |          N/A|
