@@ -18,9 +18,15 @@ Below are the corresponding system responses that occur when the appropriate Cri
 
 # Manual Fallbacks Definition 
 
-Manual fallback occurs when a sensor experiences a fault or invalid data. Feedback data validity can be detected through either monitoring sensor current, setting appropriate value range limits, or a communication watchdog. If the relevant sensor feedback fails, certain systems, such as the main drive or the thrust system can remain operational under a controlled manual open-loop mode. In this mode, a user/operator will be able to send limited control commands to these systems without automatic feedback regulation. 
+Manual fallback allows the user to manually control a system, and is useful for when a sensor experiences a fault or invalid data. Feedback data validity can be detected through either monitoring sensor current, setting appropriate value range limits, or a communication watchdog. If the relevant sensor feedback fails, certain systems, such as the main drive or the thrust system can remain operational under a controlled manual open-loop mode. In this mode, a user/operator will be able to send limited control commands to these systems without automatic feedback regulation.  
 
-Entering this mode will require deliberate action from the user rather than a spontaneous switch to the mode when feedback failure occurs. Systems that cannot remain operational after feedback failure because of the safety risks that may occur will follow their respective safety response protocol. 
+This mode can be accessed from the GUI. Entering this mode will require deliberate action from the user rather than a spontaneous switch to the mode when feedback failure occurs. Systems that cannot remain operational after feedback failure because of the safety risks that may occur will follow their respective safety response protocol. 
+
+| System | Acceptable Failed Feedback | Unacceptable Feedback (Cannot run fallback system if lost) | Manual Fallback Operations (via GUI) | 
+| ------------ | ------------- |------------- |------------- |
+| Main Drive (Cutterhead, Motor) | Machine Inclination, Drill RPM, Can also be used if automatic drilling fails. | Temperature Sensor, Current Sensor, HLC-MCU communication, GUI failure,  E-Stopped activated.  | Stop/Start, Drill Speed, Drill Direction.  |
+| Thrust System | TBD | TBD | Will be added to when thrust system is closer to finalized. |
+
 
 If accurate feedback returns, the user will be able to return to the standard automated mode. This switch must be deliberate, and requires acknowledgement from the user before resumption. 
 
